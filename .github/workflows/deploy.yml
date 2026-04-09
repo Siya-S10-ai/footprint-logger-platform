@@ -17,6 +17,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: footprint-logger-platform
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,6 +29,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
+          cache-dependency-path: footprint-logger-platform/package-lock.json
 
       - name: Install
         run: npm ci
@@ -36,7 +40,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: footprint-logger-platform/dist
 
   deploy:
     needs: build
@@ -48,3 +52,4 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        
