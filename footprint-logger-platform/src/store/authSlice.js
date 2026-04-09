@@ -52,3 +52,53 @@ export const loginUser = createAsyncThunk(
   },
 )
 
+const authSlice = createSlice({
+  name: 'auth',
+  initialState: {
+    user: storedAuth?.user || null,
+    token: storedAuth?.token || '',
+    status: 'idle',
+    error: '',
+  },
+  reducers: {
+    logout(state) {
+      state.user = null
+      state.token = ''
+      state.error = ''
+      clearPersistedAuth()
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(registerUser.pending, (state) => {
+        state.status = 'loading'
+        state.error = ''
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+        state.user = action.payload.user
+        state.token = action.payload.token
+        persistAuth(action.payload)
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.payload || 'Registration failed'
+      })
+      .addCase(loginUser.pending, (state) => {
+        state.status = 'loading'
+        state.error = ''
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.status = 'succeeded'
+        state.user = action.payload.user
+        state.token = action.payload.token
+        persistAuth(action.payload)
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.status = 'failed'
+        state.error = action.payload || 'Login failed'
+      })
+    },
+  })
+
+  
