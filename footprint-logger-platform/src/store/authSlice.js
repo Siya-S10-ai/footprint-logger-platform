@@ -1,17 +1,26 @@
+// Redux Toolkit helpers for async actions and slice definition
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
+// Base API URL for server requests
 const API_URL = 'http://localhost:5000/api'
 
+// Load any persisted auth state from localStorage
 const storedAuth = JSON.parse(localStorage.getItem('footprint-auth') || 'null')
 
+// Persist auth data for session continuity
 const persistAuth = (payload) => {
   localStorage.setItem('footprint-auth', JSON.stringify(payload))
 }
 
+// Remove auth data on logout
 const clearPersistedAuth = () => {
   localStorage.removeItem('footprint-auth')
 }
 
+/*
+  Async thunk to register a new user.
+  On success, returns { token, user }.
+*/
 export const registerUser = createAsyncThunk(
   'auth/registerUser',
   async ({ name, email, password }, { rejectWithValue }) => {
@@ -32,6 +41,10 @@ export const registerUser = createAsyncThunk(
   },
 )
 
+/*
+  Async thunk to log in an existing user.
+  On success, returns { token, user }.
+*/
 export const loginUser = createAsyncThunk(
   'auth/loginUser',
   async ({ email, password }, { rejectWithValue }) => {
@@ -52,6 +65,11 @@ export const loginUser = createAsyncThunk(
   },
 )
 
+/*
+  Auth slice handles:
+  - current user and token
+  - async status and error messages
+*/
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
@@ -61,6 +79,7 @@ const authSlice = createSlice({
     error: '',
   },
   reducers: {
+    // Clear session state and persisted data
     logout(state) {
       state.user = null
       state.token = ''
@@ -70,6 +89,7 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Register flow
       .addCase(registerUser.pending, (state) => {
         state.status = 'loading'
         state.error = ''
@@ -84,6 +104,7 @@ const authSlice = createSlice({
         state.status = 'failed'
         state.error = action.payload || 'Registration failed'
       })
+      // Login flow
       .addCase(loginUser.pending, (state) => {
         state.status = 'loading'
         state.error = ''
@@ -98,8 +119,9 @@ const authSlice = createSlice({
         state.status = 'failed'
         state.error = action.payload || 'Login failed'
       })
-    },
-  })
+  },
+})
 
+// Export the logout action and the reducer
 export const { logout } = authSlice.actions
 export default authSlice.reducer
