@@ -1,5 +1,10 @@
+// React core APIs: class component and hooks
 import { Component, useEffect, useMemo, useState } from 'react'
+
+// Redux hooks for dispatching actions and reading state
 import { useDispatch, useSelector } from 'react-redux'
+
+// Activity-related async actions and local state reducers
 import {
   addLocalActivity,
   createActivity,
@@ -8,15 +13,21 @@ import {
   setFilter,
   updateWeeklyGoal,
 } from './store/activitiesSlice'
+
+// Auth-related async actions and reducers
 import { loginUser, logout, registerUser } from './store/authSlice'
+
+// Global styles for the app
 import './App.css'
 
+// Color palette by activity category (used in the chart)
 const categoryColors = {
   transport: '#1877f2',
   food: '#e67e22',
   energy: '#8e44ad',
 }
 
+// Quick-pick activities to prefill the form
 const commonActivities = [
   { name: 'Car travel', category: 'transport', co2Value: 0.21 },
   { name: 'Bus travel', category: 'transport', co2Value: 0.1 },
@@ -25,6 +36,10 @@ const commonActivities = [
   { name: 'Electricity usage', category: 'energy', co2Value: 0.5 },
 ]
 
+/*
+  Class-based chart component for the category breakdown.
+  Renders a simple bar list of category totals.
+*/
 class EmissionChart extends Component {
   render() {
     const { categoryTotals } = this.props
@@ -58,11 +73,17 @@ class EmissionChart extends Component {
   }
 }
 
+/*
+  Main application component.
+  Manages auth, activity logging, dashboard stats, and rendering.
+*/
 function App() {
+  // Redux helpers
   const dispatch = useDispatch()
   const { user, token, status: authStatus, error: authError } = useSelector((state) => state.auth)
   const { localActivities, serverActivities, dashboard, filter } = useSelector((state) => state.activities)
 
+  // Local UI state
   const [authMode, setAuthMode] = useState('login')
   const [authForm, setAuthForm] = useState({ name: '', email: '', password: '' })
   const [activityForm, setActivityForm] = useState({
@@ -73,6 +94,7 @@ function App() {
   })
   const [weeklyGoal, setWeeklyGoalState] = useState(25)
 
+  // Fetch server data whenever a token becomes available
   useEffect(() => {
     if (token) {
       dispatch(fetchActivities(token))
@@ -80,16 +102,19 @@ function App() {
     }
   }, [dispatch, token])
 
+  // Merge local or server activities, then apply the category filter
   const mergedActivities = useMemo(() => {
     const allActivities = token ? [...serverActivities] : [...localActivities]
     return filter === 'all' ? allActivities : allActivities.filter((item) => item.category === filter)
   }, [filter, localActivities, serverActivities, token])
 
+  // Total emissions across the filtered list
   const totalEmissions = useMemo(
     () => mergedActivities.reduce((sum, activity) => sum + activity.emission, 0),
     [mergedActivities],
   )
 
+  // Sum emissions by category for the chart
   const categoryTotals = useMemo(() => {
     return mergedActivities.reduce((acc, activity) => {
       acc[activity.category] = (acc[activity.category] || 0) + activity.emission
@@ -97,6 +122,7 @@ function App() {
     }, {})
   }, [mergedActivities])
 
+  // Find the highest-emission category for quick insight
   const highestCategory = useMemo(() => {
     const entries = Object.entries(categoryTotals)
     if (!entries.length) {
@@ -106,6 +132,7 @@ function App() {
     return entries[0][0]
   }, [categoryTotals])
 
+  // Handle login/register form submit
   const handleAuthSubmit = async (event) => {
     event.preventDefault()
     if (authMode === 'register') {
@@ -115,6 +142,7 @@ function App() {
     }
   }
 
+  // Prefill activity form when the quick-pick changes
   const handleQuickActivitySelect = (event) => {
     const selected = commonActivities.find((item) => item.name === event.target.value)
     if (!selected) {
@@ -128,6 +156,7 @@ function App() {
     })
   }
 
+  // Handle activity form submit (server if logged in, local if not)
   const handleActivitySubmit = async (event) => {
     event.preventDefault()
     const payload = {
@@ -147,6 +176,7 @@ function App() {
     dispatch(addLocalActivity({ ...payload, id: crypto.randomUUID() }))
   }
 
+  // Handle weekly goal updates (requires auth)
   const handleGoalSubmit = async (event) => {
     event.preventDefault()
     if (!token) {
@@ -156,6 +186,7 @@ function App() {
     dispatch(fetchDashboard(token))
   }
 
+  // Main UI layout
   return (
     <main className="app-shell">
       <header>
