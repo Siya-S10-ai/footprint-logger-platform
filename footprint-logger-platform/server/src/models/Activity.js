@@ -1,5 +1,14 @@
+// Mongoose ODM for defining the Activity schema and model
 const mongoose = require('mongoose')
 
+/*
+  Activity schema:
+  - userId links to the owning user
+  - category is restricted to known emission types
+  - co2Value/amount/emission capture the footprint calculation
+  - date is the time of the activity
+  - timestamps track create/update times
+*/
 const activitySchema = new mongoose.Schema(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -17,4 +26,5 @@ const activitySchema = new mongoose.Schema(
   { timestamps: true },
 )
 
+// Export the compiled model for use in routes and services
 module.exports = mongoose.model('Activity', activitySchema)

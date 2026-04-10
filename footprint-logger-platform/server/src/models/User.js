@@ -1,5 +1,12 @@
+// Mongoose ODM for defining the User schema and model
 const mongoose = require('mongoose')
 
+/*
+  User schema:
+  - name/email/passwordHash are required for auth
+  - weeklyGoalKg stores the user's weekly emissions goal
+  - timestamps automatically track createdAt/updatedAt
+*/
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -10,4 +17,5 @@ const userSchema = new mongoose.Schema(
   { timestamps: true },
 )
 
+// Export the compiled model for use in routes and services
 module.exports = mongoose.model('User', userSchema)
