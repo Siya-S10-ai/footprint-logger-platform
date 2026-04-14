@@ -103,10 +103,10 @@ function App() {
   }, [dispatch, token])
 
   // Merge local or server activities, then apply the category filter
-  const mergedActivities = useMemo(() => {
-    const allActivities = token ? [...serverActivities] : [...localActivities]
-    return filter === 'all' ? allActivities : allActivities.filter((item) => item.category === filter)
-  }, [filter, localActivities, serverActivities, token])
+  const mergedActivities = useMemo(() => { // useMemo caches the computed value until dependencies change.
+    const allActivities = token ? [...serverActivities] : [...localActivities] // Choose server data if logged in; clone to avoid mutating state.
+    return filter === 'all' ? allActivities : allActivities.filter((item) => item.category === filter) // Apply category filter unless showing all.
+  }, [filter, localActivities, serverActivities, token]) // Recomput only when these inputs change.
 
   // Total emissions across the filtered list
   const totalEmissions = useMemo(
