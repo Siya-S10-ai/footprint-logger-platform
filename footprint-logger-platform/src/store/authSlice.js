@@ -2,7 +2,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
 // Base API URL for server requests
-const API_URL = 'http://localhost:5000/api'
+const API_URL = 'http://127.0.0.1:5000/api'
 
 // Load any persisted auth state from localStorage
 const storedAuth = JSON.parse(localStorage.getItem('footprint-auth') || 'null')
