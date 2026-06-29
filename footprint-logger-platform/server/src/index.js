@@ -2,6 +2,7 @@
 const express = require('express')
 const mongoose = require('mongoose')
 
+
 // Middleware for cross-origin requests and parsing JSON payloads
 const cors = require('cors')
 
@@ -19,6 +20,9 @@ const authRoutes = require('./routes/auth')
 const activityRoutes = require('./routes/activities')
 const dashboardRoutes = require('./routes/dashboard')
 const userRoutes = require('./routes/users')
+// Native MongoDB route modules that run alongside the existing Mongoose routes.
+const nativeUsersRoutes = require('../routes/nativeUsers')
+const nativeActivityLogsRoutes = require('../routes/nativeActivityLogs')
 
 // Create the Express app instance
 const app = express()
@@ -42,7 +46,9 @@ app.use('/api/auth', authRoutes)
 app.use('/api/activities', activityRoutes)
 app.use('/api/dashboard', dashboardRoutes)
 app.use('/api/users', userRoutes)
-
+// Mount the native MongoDB driver examples without touching the existing Mongoose routes.
+app.use('/api/native/users', nativeUsersRoutes)
+app.use('/api/native/activity-logs', nativeActivityLogsRoutes)
 // Server port and database URI with sensible fallbacks for local dev
 const PORT = process.env.PORT || 5000
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/footprint-logger'
