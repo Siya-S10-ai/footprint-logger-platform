@@ -13,8 +13,9 @@ dist-ssr
 *.local
 
 # Environment files should never be committed.
+**/.env
 .env
-server/.env
+.env.example
 
 # Editor directories and files
 .vscode/*
