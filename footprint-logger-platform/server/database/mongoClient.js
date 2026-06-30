@@ -1,4 +1,5 @@
 ﻿/*
+Mongoose vs MongoClient:
   Mongoose is an Object Data Modeling library that sits on top of MongoDB.
   It adds schemas, models, validation, and helper methods so application code can stay expressive.
   MongoClient is the official native MongoDB driver.
@@ -9,6 +10,9 @@
 
 // MongoClient is the official driver that lets Node.js talk directly to MongoDB.
 const { MongoClient } = require('mongodb')
+
+// The connection string comes from the environment so the code can run in different environments without changes.
+//const mongoUri = process.env.MONGODB_URI
 
 // The native MongoClient example uses its own connection string so it can stay separate from the Mongoose app.
 const mongoUri = process.env.MONGODB_NATIVE_URI
@@ -37,6 +41,11 @@ async function getDatabase() {
     return databaseInstance
   }
 
+  /*
+  if (!mongoUri) {
+    throw new Error('MONGODB_URI is not defined in the environment.')
+  }
+*/
   if (!mongoUri) {
     throw new Error('MONGODB_NATIVE_URI is not defined in the environment.')
   }
